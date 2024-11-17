@@ -20,7 +20,7 @@ fn cli() {
             "1. CREATE, 2. UPDATE, 3. SEARCH, 4. REMOVE, 5. LIST or any other number to EXIT",
             &mut input,
         );
-        let input: i8 = input.trim().parse().unwrap();
+        let input: i8 = input.trim().parse().unwrap_or_default();
 
         match input {
             1 => employees.push(create_employee()),
@@ -43,10 +43,10 @@ fn create_employee() -> Employee {
     read("Enter new employee rate: ", &mut rate);
 
     Employee {
-        name: name.trim().parse().unwrap(),
-        phone: phone.trim().parse().unwrap(),
-        email: email.trim().parse().unwrap(),
-        rate: rate.trim().parse().unwrap(),
+        name: name.trim().parse().unwrap_or_default(),
+        phone: phone.trim().parse().unwrap_or_default(),
+        email: email.trim().parse().unwrap_or_default(),
+        rate: rate.trim().parse().unwrap_or_default(),
     }
 }
 
@@ -54,7 +54,7 @@ fn update_employee(employees: &mut Vec<Employee>) {
     let (mut input, mut flag) = (String::new(), false);
 
     read("Enter employee details", &mut input);
-    let input: String = input.trim().parse().unwrap();
+    let input: String = input.trim().parse().unwrap_or_default();
 
     for i in 0..employees.len() {
         if employees[i].get_name() == input {
@@ -73,7 +73,7 @@ fn search_employee(employees: &mut Vec<Employee>) {
     let mut input: String = String::new();
 
     read("Enter employee details to search", &mut input);
-    let input: String = input.trim().parse().unwrap();
+    let input: String = input.trim().parse().unwrap_or_default();
 
     for employee in employees {
         if input == employee.get_name() {
@@ -88,7 +88,7 @@ fn remove_employee(employees: &mut Vec<Employee>) {
     let mut input: String = String::new();
 
     read("Enter details of employee to be deleted", &mut input);
-    let input: String = input.trim().parse().unwrap();
+    let input: String = input.trim().parse().unwrap_or_default();
 
     employees.retain(|employee| employee.get_name() != input);
     list_employees(employees);
