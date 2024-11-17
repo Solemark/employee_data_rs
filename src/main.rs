@@ -7,72 +7,63 @@ use std::{
     process::exit,
 };
 
-fn display(employees: &Vec<Employee>) {
-    println!("{:?}", employees);
+fn main() {
+    cli();
 }
 
-fn read(input: &mut String) {
-    stdout().flush().expect("failed to flush!");
-    stdin().read_line(input).expect("Failed to read!");
+fn cli() {
+    println!("Employee CLI 1.0");
+    let mut employees: Vec<Employee> = vec![];
+    loop {
+        let mut input: String = String::new();
+        read(
+            "1. CREATE, 2. UPDATE, 3. SEARCH, 4. REMOVE, 5. LIST or any other number to EXIT",
+            &mut input,
+        );
+        let input: i8 = input.trim().parse().unwrap();
+
+        match input {
+            1 => employees.push(create_employee()),
+            2 => update_employee(&mut employees),
+            3 => search_employee(&mut employees),
+            4 => remove_employee(&mut employees),
+            5 => list_employees(&employees),
+            _ => exit(0),
+        }
+    }
 }
 
-fn get_data(name: &mut String, phone: &mut String, email: &mut String, rate: &mut String) {
-    println!("Enter new employee name: ");
-    read(name);
+fn create_employee() -> Employee {
+    let (mut name, mut phone, mut email, mut rate) =
+        (String::new(), String::new(), String::new(), String::new());
 
-    println!("Enter new employee phone: ");
-    read(phone);
+    read("Enter new employee name: ", &mut name);
+    read("Enter new employee phone: ", &mut phone);
+    read("Enter new employee email: ", &mut email);
+    read("Enter new employee rate: ", &mut rate);
 
-    println!("Enter new employee email: ");
-    read(email);
-
-    println!("Enter new employee rate: ");
-    read(rate);
-}
-
-fn create_employee(employees: &mut Vec<Employee>) {
-    let mut name: String = String::new();
-    let mut phone: String = String::new();
-    let mut email: String = String::new();
-    let mut rate: String = String::new();
-
-    println!("Create a new employee");
-    get_data(&mut name, &mut phone, &mut email, &mut rate);
-
-    employees.push(Employee {
+    Employee {
         name: name.trim().parse().unwrap(),
         phone: phone.trim().parse().unwrap(),
         email: email.trim().parse().unwrap(),
         rate: rate.trim().parse().unwrap(),
-    });
-    display(employees);
+    }
 }
 
 fn update_employee(employees: &mut Vec<Employee>) {
-    let mut input: String = String::new();
-    let mut name: String = String::new();
-    let mut phone: String = String::new();
-    let mut email: String = String::new();
-    let mut rate: String = String::new();
-    let mut flag: bool = false;
+    let (mut input, mut flag) = (String::new(), false);
 
-    println!("Enter employee details");
-    read(&mut input);
+    read("Enter employee details", &mut input);
+    let input: String = input.trim().parse().unwrap();
 
-    let value: String = input.trim().parse().unwrap();
-    for employee in &mut *employees {
-        if value == employee.get_name() {
+    for i in 0..employees.len() {
+        if employees[i].get_name() == input {
             flag = true;
-            get_data(&mut name, &mut phone, &mut email, &mut rate);
-
-            employee.set_name(name.trim().parse().unwrap());
-            employee.set_phone(name.trim().parse().unwrap());
-            employee.set_email(name.trim().parse().unwrap());
-            employee.set_rate(name.trim().parse().unwrap());
+            employees[i] = create_employee();
         }
     }
     if flag {
-        display(employees);
+        list_employees(employees);
     } else {
         println!("Error! Couldn't find employee")
     }
@@ -81,12 +72,11 @@ fn update_employee(employees: &mut Vec<Employee>) {
 fn search_employee(employees: &mut Vec<Employee>) {
     let mut input: String = String::new();
 
-    println!("Enter employee details to search");
-    read(&mut input);
+    read("Enter employee details to search", &mut input);
+    let input: String = input.trim().parse().unwrap();
 
-    let value: String = input.trim().parse().unwrap();
     for employee in employees {
-        if value == employee.get_name() {
+        if input == employee.get_name() {
             println!("found employee: {:?}", employee);
             return;
         }
@@ -97,37 +87,19 @@ fn search_employee(employees: &mut Vec<Employee>) {
 fn remove_employee(employees: &mut Vec<Employee>) {
     let mut input: String = String::new();
 
-    println!("Enter details of employee to be deleted");
-    read(&mut input);
+    read("Enter details of employee to be deleted", &mut input);
+    let input: String = input.trim().parse().unwrap();
 
-    let value: String = input.trim().parse().unwrap();
-    employees.retain(|employee| employee.get_name() != value);
-    display(&employees);
+    employees.retain(|employee| employee.get_name() != input);
+    list_employees(employees);
 }
 
-fn cli() {
-    println!("Employee CLI 1.0");
-    let mut employees: Vec<Employee> = vec![];
-    let options: String =
-        String::from("Do you want to 1. CREATE, 2. UPDATE, 3. SEARCH, 4. REMOVE or 0. EXIT");
-    loop {
-        let mut input: String = String::new();
-        println!("{}", &options);
-
-        read(&mut input);
-        let input: i8 = input.trim().parse().unwrap();
-
-        match input {
-            1 => create_employee(&mut employees),
-            2 => update_employee(&mut employees),
-            3 => search_employee(&mut employees),
-            4 => remove_employee(&mut employees),
-            0 => exit(0),
-            _ => println!("{}", &options),
-        }
-    }
+fn list_employees(employees: &Vec<Employee>) {
+    println!("{:?}", employees)
 }
 
-fn main() {
-    cli();
+fn read(msg: &str, input: &mut String) {
+    println!("{}", msg);
+    stdout().flush().expect("failed to flush!");
+    stdin().read_line(input).expect("Failed to read!");
 }
