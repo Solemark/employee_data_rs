@@ -1,5 +1,4 @@
-use crate::employee;
-use employee::Employee;
+use crate::employee::Employee;
 use std::{
     io::{stdin, stdout, Write},
     process::exit,
