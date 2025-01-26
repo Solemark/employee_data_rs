@@ -1,9 +1,9 @@
 #[allow(dead_code)]
 pub struct Employee {
-    pub(crate) name: String,
-    pub(crate) phone: String,
-    pub(crate) email: String,
-    pub(crate) rate: f32,
+    pub name: String,
+    pub phone: String,
+    pub email: String,
+    pub rate: f32,
 }
 impl Employee {
     pub fn get_name(&self) -> String {
