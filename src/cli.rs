@@ -4,18 +4,24 @@ use std::{
     process::exit,
 };
 
+// messages
+const TITLE: &str = "Employee CLI 1.0";
+const ACTION_MSG: &str =
+    "1. CREATE, 2. UPDATE, 3. SEARCH, 4. REMOVE, 5. LIST any other key to EXIT";
+const EMP_NAME: &str = "employee name";
+const EMP_PHONE: &str = "employee phone";
+const EMP_EMAIL: &str = "employee email";
+const EMP_RATE: &str = "employee rate";
+const EMP_DETAILS: &str = "employee details";
+const EMP_404: &str = "employee not found";
+const READ_ERR: &str = "failed to read";
+const FLUSH_ERR: &str = "failed to flush";
+
 pub fn cli() {
-    println!("Employee CLI 1.0");
+    println!("{TITLE}");
     let mut employees: Vec<Employee> = vec![];
     loop {
-        let mut input: String = String::new();
-        read(
-            "1. CREATE, 2. UPDATE, 3. SEARCH, 4. REMOVE, 5. LIST or any other number to EXIT",
-            &mut input,
-        );
-        let input: i8 = input.trim().parse().unwrap_or_default();
-
-        match input {
+        match read(ACTION_MSG).trim().parse().unwrap_or_default() {
             1 => employees.push(create_employee()),
             2 => update_employee(&mut employees),
             3 => search_employee(&mut employees),
@@ -27,30 +33,19 @@ pub fn cli() {
 }
 
 fn create_employee() -> Employee {
-    let (mut name, mut phone, mut email, mut rate) =
-        (String::new(), String::new(), String::new(), String::new());
-
-    read("Enter new employee name: ", &mut name);
-    read("Enter new employee phone: ", &mut phone);
-    read("Enter new employee email: ", &mut email);
-    read("Enter new employee rate: ", &mut rate);
-
     Employee {
-        name: name.trim().parse().unwrap_or_default(),
-        phone: phone.trim().parse().unwrap_or_default(),
-        email: email.trim().parse().unwrap_or_default(),
-        rate: rate.trim().parse().unwrap_or_default(),
+        name: read(EMP_NAME).trim().to_string(),
+        phone: read(EMP_PHONE).trim().to_string(),
+        email: read(EMP_EMAIL).trim().to_string(),
+        rate: read(EMP_RATE).trim().parse().unwrap_or_default(),
     }
 }
 
 fn update_employee(employees: &mut Vec<Employee>) {
-    let (mut input, mut flag) = (String::new(), false);
-
-    read("Enter employee details", &mut input);
-    let input: String = input.trim().parse().unwrap_or_default();
-
+    let mut flag = false;
+    let input = read(EMP_DETAILS).trim().to_string();
     for i in 0..employees.len() {
-        if employees[i].get_name() == input {
+        if employees[i].name == input {
             flag = true;
             employees[i] = create_employee();
         }
@@ -58,43 +53,38 @@ fn update_employee(employees: &mut Vec<Employee>) {
     if flag {
         list_employees(employees);
     } else {
-        println!("Error! Couldn't find employee")
+        println!("{EMP_404}")
     }
 }
 
 fn search_employee(employees: &mut Vec<Employee>) {
-    let mut input: String = String::new();
-
-    read("Enter employee details to search", &mut input);
-    let input: String = input.trim().parse().unwrap_or_default();
+    let input = read(EMP_DETAILS).trim().to_string();
 
     for employee in employees {
-        if input == employee.get_name() {
-            println!("found employee: {}", employee.get_string());
+        if input == employee.name {
+            println!("{employee}");
             return;
         }
     }
-    println!("No employee found!");
+    println!("{EMP_404}")
 }
 
 fn remove_employee(employees: &mut Vec<Employee>) {
-    let mut input: String = String::new();
-
-    read("Enter details of employee to be deleted", &mut input);
-    let input: String = input.trim().parse().unwrap_or_default();
-
-    employees.retain(|employee| employee.get_name() != input);
+    let input = read(EMP_DETAILS).trim().to_string();
+    employees.retain(|employee| employee.name != input);
     list_employees(employees);
 }
 
 fn list_employees(employees: &Vec<Employee>) {
     for employee in employees {
-        println!("{}", employee.get_string());
+        println!("{employee}");
     }
 }
 
-fn read(msg: &str, input: &mut String) {
-    println!("{}", msg);
-    stdout().flush().expect("failed to flush!");
-    stdin().read_line(input).expect("Failed to read!");
+fn read(msg: &str) -> String {
+    println!("{msg}: ");
+    let mut input = String::new();
+    stdout().flush().expect(FLUSH_ERR);
+    stdin().read_line(&mut input).expect(READ_ERR);
+    input
 }

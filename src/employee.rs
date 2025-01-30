@@ -5,13 +5,10 @@ pub struct Employee {
     pub email: String,
     pub rate: f32,
 }
-impl Employee {
-    pub fn get_name(&self) -> String {
-        self.name.clone()
-    }
-
-    pub fn get_string(&self) -> String {
-        format!(
+impl std::fmt::Display for Employee {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(
+            f,
             "name: {}, phone: {}, email: {}, rate: {}",
             self.name, self.phone, self.email, self.rate
         )
