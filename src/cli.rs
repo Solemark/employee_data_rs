@@ -22,17 +22,17 @@ pub fn cli() {
     let mut employees: Vec<Employee> = vec![];
     loop {
         match read(ACTION_MSG).trim().parse().unwrap_or_default() {
-            1 => employees.push(create_employee()),
-            2 => update_employee(&mut employees),
-            3 => search_employee(&mut employees),
-            4 => remove_employee(&mut employees),
-            5 => list_employees(&employees),
+            1 => employees.push(create()),
+            2 => println!("{}", update(&mut employees)),
+            3 => println!("{}", search(&mut employees)),
+            4 => println!("{}", remove(&mut employees)),
+            5 => println!("{}", list(&employees)),
             _ => exit(0),
         }
     }
 }
 
-fn create_employee() -> Employee {
+fn create() -> Employee {
     Employee {
         name: read(EMP_NAME).trim().to_string(),
         phone: read(EMP_PHONE).trim().to_string(),
@@ -41,44 +41,44 @@ fn create_employee() -> Employee {
     }
 }
 
-fn update_employee(employees: &mut Vec<Employee>) {
+fn update(employees: &mut Vec<Employee>) -> String {
     let mut flag = false;
     let input = read(EMP_DETAILS).trim().to_string();
     for i in 0..employees.len() {
         if employees[i].name == input {
             flag = true;
-            employees[i] = create_employee();
+            employees[i] = create();
         }
     }
     if flag {
-        list_employees(employees);
+        list(employees)
     } else {
-        println!("{EMP_404}")
+        EMP_404.to_string()
     }
 }
 
-fn search_employee(employees: &mut Vec<Employee>) {
+fn search(employees: &mut Vec<Employee>) -> String {
     let input = read(EMP_DETAILS).trim().to_string();
-
     for employee in employees {
         if input == employee.name {
-            println!("{employee}");
-            return;
+            return employee.to_string();
         }
     }
-    println!("{EMP_404}")
+    EMP_404.to_string()
 }
 
-fn remove_employee(employees: &mut Vec<Employee>) {
+fn remove(employees: &mut Vec<Employee>) -> String {
     let input = read(EMP_DETAILS).trim().to_string();
     employees.retain(|employee| employee.name != input);
-    list_employees(employees);
+    list(employees)
 }
 
-fn list_employees(employees: &Vec<Employee>) {
+fn list(employees: &Vec<Employee>) -> String {
+    let mut list = String::new();
     for employee in employees {
-        println!("{employee}");
+        list += &employee.to_string();
     }
+    list
 }
 
 fn read(msg: &str) -> String {
